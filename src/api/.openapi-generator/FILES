@@ -1,0 +1,16 @@
+.openapi-generator-ignore
+apis/GameApi.ts
+apis/HealthApi.ts
+apis/index.ts
+index.ts
+models/CreateGame.ts
+models/ExchangePayload.ts
+models/Game.ts
+models/Good.ts
+models/GoodOrCamel.ts
+models/Healthstatus.ts
+models/SellPayload.ts
+models/TakeGoodPayload.ts
+models/Tokens.ts
+models/index.ts
+runtime.ts
