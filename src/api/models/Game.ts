@@ -25,7 +25,7 @@ import {
 } from './';
 
 /**
- * A game
+ * A complete game
  * @export
  * @interface Game
  */

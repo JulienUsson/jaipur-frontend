@@ -24,6 +24,9 @@ import {
     Game,
     GameFromJSON,
     GameToJSON,
+    GamePreview,
+    GamePreviewFromJSON,
+    GamePreviewToJSON,
     SellPayload,
     SellPayloadFromJSON,
     SellPayloadToJSON,
@@ -37,33 +40,34 @@ export interface CreateGameRequest {
 }
 
 export interface DeleteGameByIdRequest {
-    id: number;
+    gameId: number;
 }
 
 export interface ExchangeRequest {
-    id: number;
-    playerIndex: number;
+    gameId: number;
+    playerId: number;
     exchangePayload?: ExchangePayload;
 }
 
 export interface FindOneGameByIdRequest {
-    id: number;
+    gameId: number;
 }
 
 export interface SellRequest {
-    id: number;
+    gameId: number;
+    playerId: number;
     playerIndex: number;
     sellPayload?: SellPayload;
 }
 
 export interface TakeCamelsRequest {
-    id: number;
-    playerIndex: number;
+    gameId: number;
+    playerId: number;
 }
 
 export interface TakeGoodRequest {
-    id: number;
-    playerIndex: number;
+    gameId: number;
+    playerId: number;
     takeGoodPayload?: TakeGoodPayload;
 }
 
@@ -105,8 +109,8 @@ export class GameApi extends runtime.BaseAPI {
      * Supprimer une partie
      */
     async deleteGameByIdRaw(requestParameters: DeleteGameByIdRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteGameById.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling deleteGameById.');
         }
 
         const queryParameters: any = {};
@@ -114,7 +118,7 @@ export class GameApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/games/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/games/{gameId}`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -134,12 +138,12 @@ export class GameApi extends runtime.BaseAPI {
      * Prendre plusieurs marchandises
      */
     async exchangeRaw(requestParameters: ExchangeRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling exchange.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling exchange.');
         }
 
-        if (requestParameters.playerIndex === null || requestParameters.playerIndex === undefined) {
-            throw new runtime.RequiredError('playerIndex','Required parameter requestParameters.playerIndex was null or undefined when calling exchange.');
+        if (requestParameters.playerId === null || requestParameters.playerId === undefined) {
+            throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling exchange.');
         }
 
         const queryParameters: any = {};
@@ -148,13 +152,9 @@ export class GameApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.playerIndex !== undefined && requestParameters.playerIndex !== null) {
-            headerParameters['playerIndex'] = String(requestParameters.playerIndex);
-        }
-
         const response = await this.request({
-            path: `/games/{id}/exchange`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
+            path: `/games/{gameId}/players/{playerId}/exchange`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ExchangePayloadToJSON(requestParameters.exchangePayload),
@@ -174,7 +174,7 @@ export class GameApi extends runtime.BaseAPI {
     /**
      * Récupérer toutes les parties
      */
-    async findAllGamesRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<Game>>> {
+    async findAllActiveGamesRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<GamePreview>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -186,14 +186,14 @@ export class GameApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GameFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GamePreviewFromJSON));
     }
 
     /**
      * Récupérer toutes les parties
      */
-    async findAllGames(initOverrides?: RequestInit): Promise<Array<Game>> {
-        const response = await this.findAllGamesRaw(initOverrides);
+    async findAllActiveGames(initOverrides?: RequestInit): Promise<Array<GamePreview>> {
+        const response = await this.findAllActiveGamesRaw(initOverrides);
         return await response.value();
     }
 
@@ -201,8 +201,8 @@ export class GameApi extends runtime.BaseAPI {
      * Récupérer une partie
      */
     async findOneGameByIdRaw(requestParameters: FindOneGameByIdRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling findOneGameById.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling findOneGameById.');
         }
 
         const queryParameters: any = {};
@@ -210,7 +210,7 @@ export class GameApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/games/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/games/{gameId}`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -231,8 +231,12 @@ export class GameApi extends runtime.BaseAPI {
      * Vendre des cartes
      */
     async sellRaw(requestParameters: SellRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling sell.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling sell.');
+        }
+
+        if (requestParameters.playerId === null || requestParameters.playerId === undefined) {
+            throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling sell.');
         }
 
         if (requestParameters.playerIndex === null || requestParameters.playerIndex === undefined) {
@@ -250,8 +254,8 @@ export class GameApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/games/{id}/sell`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
+            path: `/games/{gameId}/players/{playerId}/sell`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: SellPayloadToJSON(requestParameters.sellPayload),
@@ -272,25 +276,21 @@ export class GameApi extends runtime.BaseAPI {
      * Prendre les chameaux
      */
     async takeCamelsRaw(requestParameters: TakeCamelsRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling takeCamels.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling takeCamels.');
         }
 
-        if (requestParameters.playerIndex === null || requestParameters.playerIndex === undefined) {
-            throw new runtime.RequiredError('playerIndex','Required parameter requestParameters.playerIndex was null or undefined when calling takeCamels.');
+        if (requestParameters.playerId === null || requestParameters.playerId === undefined) {
+            throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling takeCamels.');
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.playerIndex !== undefined && requestParameters.playerIndex !== null) {
-            headerParameters['playerIndex'] = String(requestParameters.playerIndex);
-        }
-
         const response = await this.request({
-            path: `/games/{id}/take-camels`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
+            path: `/games/{gameId}/players/{playerId}/take-camels`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -310,12 +310,12 @@ export class GameApi extends runtime.BaseAPI {
      * Prendre 1 seule marchandise
      */
     async takeGoodRaw(requestParameters: TakeGoodRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling takeGood.');
+        if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling takeGood.');
         }
 
-        if (requestParameters.playerIndex === null || requestParameters.playerIndex === undefined) {
-            throw new runtime.RequiredError('playerIndex','Required parameter requestParameters.playerIndex was null or undefined when calling takeGood.');
+        if (requestParameters.playerId === null || requestParameters.playerId === undefined) {
+            throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling takeGood.');
         }
 
         const queryParameters: any = {};
@@ -324,13 +324,9 @@ export class GameApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.playerIndex !== undefined && requestParameters.playerIndex !== null) {
-            headerParameters['playerIndex'] = String(requestParameters.playerIndex);
-        }
-
         const response = await this.request({
-            path: `/games/{id}/take-good`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
+            path: `/games/{gameId}/players/{playerId}/take-good`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: TakeGoodPayloadToJSON(requestParameters.takeGoodPayload),

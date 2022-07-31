@@ -1,10 +1,10 @@
 import useSWR from 'swr'
 
-import { GameApi } from '../api'
+import { useGameApi } from '../contexts/ApiConfigContext'
 
-export default function useGame(id: number) {
-  const api = new GameApi()
-  const { data } = useSWR(`games/${id}`, async () => await api.findOneGameById({ id }), {
+export default function useGame(gameId: number) {
+  const api = useGameApi()
+  const { data } = useSWR(`games/${gameId}`, async () => await api.findOneGameById({ gameId }), {
     suspense: true,
     refreshInterval: 3000,
   })

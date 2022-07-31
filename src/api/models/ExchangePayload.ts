@@ -35,13 +35,13 @@ export interface ExchangePayload {
      * @type {Array<Good>}
      * @memberof ExchangePayload
      */
-    take?: Array<Good>;
+    take: Array<Good>;
     /**
      * 
      * @type {Array<GoodOrCamel>}
      * @memberof ExchangePayload
      */
-    give?: Array<GoodOrCamel>;
+    give: Array<GoodOrCamel>;
 }
 
 export function ExchangePayloadFromJSON(json: any): ExchangePayload {
@@ -54,8 +54,8 @@ export function ExchangePayloadFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'take': !exists(json, 'take') ? undefined : ((json['take'] as Array<any>).map(GoodFromJSON)),
-        'give': !exists(json, 'give') ? undefined : ((json['give'] as Array<any>).map(GoodOrCamelFromJSON)),
+        'take': ((json['take'] as Array<any>).map(GoodFromJSON)),
+        'give': ((json['give'] as Array<any>).map(GoodOrCamelFromJSON)),
     };
 }
 
@@ -68,8 +68,8 @@ export function ExchangePayloadToJSON(value?: ExchangePayload | null): any {
     }
     return {
         
-        'take': value.take === undefined ? undefined : ((value.take as Array<any>).map(GoodToJSON)),
-        'give': value.give === undefined ? undefined : ((value.give as Array<any>).map(GoodOrCamelToJSON)),
+        'take': ((value.take as Array<any>).map(GoodToJSON)),
+        'give': ((value.give as Array<any>).map(GoodOrCamelToJSON)),
     };
 }
 

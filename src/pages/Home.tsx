@@ -1,33 +1,58 @@
-import { List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material'
-import { useHistory } from 'react-router-dom'
-
-import { Game } from '../api'
+import {
+  Card,
+  Container,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListSubheader,
+  Typography,
+} from '@mui/material'
+import { Link } from 'react-router-dom'
 
 import useGames from '../hooks/useGames'
 
 export default function Home() {
-  const history = useHistory()
-  const games = useGames()
-
-  function handleGameClick(game: Game) {
-    return () => {
-      const playerIndex = 1
-      history.push(`/games/${game.id}/player/${playerIndex}`)
-    }
-  }
+  const { data: games } = useGames()
 
   return (
-    <>
-      <Typography variant="h2">Jaipur</Typography>
-      <List>
-        {games.map((game) => (
-          <ListItem key={game.id}>
-            <ListItemButton onClick={handleGameClick(game)}>
-              <ListItemText primary={game.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </>
+    <Container maxWidth="md">
+      <Typography variant="h2" gutterBottom>
+        Jaipur
+      </Typography>
+      <Card>
+        <List subheader={<ListSubheader>Liste des parties</ListSubheader>}>
+          {games && games.length > 0 ? (
+            games.map((game) => (
+              <ListItem
+                key={game.id}
+                secondaryAction={
+                  <>
+                    <Link to={`/games/${game.id}/player/1`}>
+                      <IconButton edge="end">1</IconButton>
+                    </Link>
+                    <Link to={`/games/${game.id}/player/2`}>
+                      <IconButton edge="end">2</IconButton>
+                    </Link>
+                  </>
+                }
+              >
+                <ListItemButton>
+                  <ListItemText primary={game.name} />
+                </ListItemButton>
+              </ListItem>
+            ))
+          ) : (
+            <ListItem>
+              <ListItemText
+                primary="Pas de parties trouvés..."
+                primaryTypographyProps={{ color: 'textSecondary' }}
+              />
+            </ListItem>
+          )}
+        </List>
+      </Card>
+    </Container>
   )
 }

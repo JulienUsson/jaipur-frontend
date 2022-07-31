@@ -5,12 +5,12 @@ import useGame from '../hooks/useGame'
 
 export default function Game() {
   const { gameId, playerIndex } = useParams<{ gameId: string; playerIndex: string }>()
-  const game = useGame(parseInt(gameId))
+  const game = useGame(parseInt(gameId!))
 
   return (
     <>
       <Typography variant="h2">
-        Partie {game.name} Joueur {playerIndex + 1}
+        Partie {game.name} Joueur {playerIndex! + 1}
       </Typography>
 
       <Typography variant="h6">Marché</Typography>

@@ -14,34 +14,41 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * A game with minimal infos
  * @export
- * @interface CreateGame
+ * @interface GamePreview
  */
-export interface CreateGame {
+export interface GamePreview {
     /**
      * 
      * @type {string}
-     * @memberof CreateGame
+     * @memberof GamePreview
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GamePreview
      */
     name: string;
 }
 
-export function CreateGameFromJSON(json: any): CreateGame {
-    return CreateGameFromJSONTyped(json, false);
+export function GamePreviewFromJSON(json: any): GamePreview {
+    return GamePreviewFromJSONTyped(json, false);
 }
 
-export function CreateGameFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateGame {
+export function GamePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): GamePreview {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
+        'id': json['id'],
         'name': json['name'],
     };
 }
 
-export function CreateGameToJSON(value?: CreateGame | null): any {
+export function GamePreviewToJSON(value?: GamePreview | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -50,6 +57,7 @@ export function CreateGameToJSON(value?: CreateGame | null): any {
     }
     return {
         
+        'id': value.id,
         'name': value.name,
     };
 }

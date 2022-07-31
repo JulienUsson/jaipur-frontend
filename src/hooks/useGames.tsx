@@ -1,12 +1,10 @@
 import useSWR from 'swr'
 
-import { GameApi } from '../api'
+import { useGameApi } from '../contexts/ApiConfigContext'
 
 export default function useGames() {
-  const api = new GameApi()
-  const { data } = useSWR('games', async () => await api.findAllGames(), {
-    suspense: true,
+  const api = useGameApi()
+  return useSWR('games', async () => await api.findAllActiveGames(), {
     refreshInterval: 3000,
   })
-  return data!
 }
