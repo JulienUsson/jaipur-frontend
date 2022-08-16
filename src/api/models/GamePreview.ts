@@ -21,10 +21,10 @@ import { exists, mapValues } from '../runtime';
 export interface GamePreview {
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof GamePreview
      */
-    id: string;
+    id: number;
     /**
      * 
      * @type {string}

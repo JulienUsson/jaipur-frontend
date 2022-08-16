@@ -1,3 +1,5 @@
+import './index.css'
+
 import { CssBaseline } from '@mui/material'
 import React from 'react'
 import { createRoot } from 'react-dom/client'

@@ -1,9 +1,7 @@
 import { Container, Typography } from '@mui/material'
 import { FallbackProps } from 'react-error-boundary'
 
-import ApiConfigForm from './ApiConfigForm'
-
-export default function Error({ error, resetErrorBoundary }: FallbackProps) {
+export default function Error({ error }: FallbackProps) {
   return (
     <Container maxWidth="md" sx={{ mt: 2 }}>
       <Typography variant="h3" gutterBottom>

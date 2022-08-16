@@ -49,8 +49,9 @@ export interface ExchangeRequest {
     exchangePayload?: ExchangePayload;
 }
 
-export interface FindOneGameByIdRequest {
+export interface FindOneGameByIdAndPlayerIdRequest {
     gameId: number;
+    playerId: number;
 }
 
 export interface SellRequest {
@@ -79,7 +80,7 @@ export class GameApi extends runtime.BaseAPI {
     /**
      * Créer une partie
      */
-    async createGameRaw(requestParameters: CreateGameRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
+    async createGameRaw(requestParameters: CreateGameRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<GamePreview>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -94,13 +95,13 @@ export class GameApi extends runtime.BaseAPI {
             body: CreateGameToJSON(requestParameters.createGame),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => GameFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => GamePreviewFromJSON(jsonValue));
     }
 
     /**
      * Créer une partie
      */
-    async createGame(requestParameters: CreateGameRequest, initOverrides?: RequestInit): Promise<Game> {
+    async createGame(requestParameters: CreateGameRequest, initOverrides?: RequestInit): Promise<GamePreview> {
         const response = await this.createGameRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -200,9 +201,13 @@ export class GameApi extends runtime.BaseAPI {
     /**
      * Récupérer une partie
      */
-    async findOneGameByIdRaw(requestParameters: FindOneGameByIdRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
+    async findOneGameByIdAndPlayerIdRaw(requestParameters: FindOneGameByIdAndPlayerIdRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Game>> {
         if (requestParameters.gameId === null || requestParameters.gameId === undefined) {
-            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling findOneGameById.');
+            throw new runtime.RequiredError('gameId','Required parameter requestParameters.gameId was null or undefined when calling findOneGameByIdAndPlayerId.');
+        }
+
+        if (requestParameters.playerId === null || requestParameters.playerId === undefined) {
+            throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling findOneGameByIdAndPlayerId.');
         }
 
         const queryParameters: any = {};
@@ -210,7 +215,7 @@ export class GameApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/games/{gameId}`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))),
+            path: `/games/{gameId}/players/{playerId}`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -222,8 +227,8 @@ export class GameApi extends runtime.BaseAPI {
     /**
      * Récupérer une partie
      */
-    async findOneGameById(requestParameters: FindOneGameByIdRequest, initOverrides?: RequestInit): Promise<Game> {
-        const response = await this.findOneGameByIdRaw(requestParameters, initOverrides);
+    async findOneGameByIdAndPlayerId(requestParameters: FindOneGameByIdAndPlayerIdRequest, initOverrides?: RequestInit): Promise<Game> {
+        const response = await this.findOneGameByIdAndPlayerIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

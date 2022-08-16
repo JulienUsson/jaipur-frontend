@@ -44,12 +44,6 @@ export interface Game {
     name: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof Game
-     */
-    isDone: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof Game
      */
@@ -66,6 +60,24 @@ export interface Game {
      * @memberof Game
      */
     tokens: Tokens;
+    /**
+     * 
+     * @type {Array<Good>}
+     * @memberof Game
+     */
+    hand: Array<Good>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Game
+     */
+    camelsCount: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Game
+     */
+    winnerIndex?: number;
 }
 
 export function GameFromJSON(json: any): Game {
@@ -80,10 +92,12 @@ export function GameFromJSONTyped(json: any, ignoreDiscriminator: boolean): Game
         
         'currentPlayerIndex': json['currentPlayerIndex'],
         'name': json['name'],
-        'isDone': json['isDone'],
         'id': json['id'],
         'market': ((json['market'] as Array<any>).map(GoodFromJSON)),
         'tokens': TokensFromJSON(json['tokens']),
+        'hand': ((json['hand'] as Array<any>).map(GoodFromJSON)),
+        'camelsCount': json['camelsCount'],
+        'winnerIndex': !exists(json, 'winnerIndex') ? undefined : json['winnerIndex'],
     };
 }
 
@@ -98,10 +112,12 @@ export function GameToJSON(value?: Game | null): any {
         
         'currentPlayerIndex': value.currentPlayerIndex,
         'name': value.name,
-        'isDone': value.isDone,
         'id': value.id,
         'market': ((value.market as Array<any>).map(GoodToJSON)),
         'tokens': TokensToJSON(value.tokens),
+        'hand': ((value.hand as Array<any>).map(GoodToJSON)),
+        'camelsCount': value.camelsCount,
+        'winnerIndex': value.winnerIndex,
     };
 }
 
