@@ -13,7 +13,7 @@ export default function ApiConfigForm({ onChange }: Props) {
   const [config, setConfig] = useApiConfig()
 
   const [basePath, setBasePath] = useState(config.basePath)
-  const handleSubmit: FormEventHandler = (e) => {
+  const handleSubmit: FormEventHandler = () => {
     setConfig(new Configuration({ basePath }))
     onChange?.(basePath)
   }
