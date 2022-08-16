@@ -9,8 +9,6 @@ export default function Game() {
   const playerId = usePlayerIndexFromPath()
   const game = useGame(gameId, playerId)
 
-  console.log(game)
-
   return (
     <Container>
       <Typography variant="h2" gutterBottom>

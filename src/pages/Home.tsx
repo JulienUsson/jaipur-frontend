@@ -1,7 +1,9 @@
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
   Alert,
+  Box,
   Button,
   Card,
   Container,
@@ -24,12 +26,15 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { mutate } from 'swr'
 
-import { useGameApi } from '../contexts/ApiConfigContext'
+import { Configuration } from '../api'
+
+import { useApiConfig, useGameApi } from '../contexts/ApiConfigContext'
 import useGames from '../hooks/useGames'
 import createDialog from '../utils/createDialog'
 
 export default function Home() {
   const api = useGameApi()
+  const [config, setConfig] = useApiConfig()
   const { data: games } = useGames()
   const navigate = useNavigate()
 
@@ -67,11 +72,26 @@ export default function Home() {
     }
   }
 
+  const handleSettingsClick = async () => {
+    const basePath = await createDialog<string | undefined>((onClose) => (
+      <SettingsDialog defaultBasePath={config.basePath} onClose={onClose} />
+    ))
+    if (!basePath) return
+
+    setConfig(new Configuration({ basePath }))
+    mutate('games')
+  }
+
   return (
     <Container maxWidth="md">
-      <Typography variant="h2" gutterBottom>
-        Jaipur
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Typography variant="h2" gutterBottom>
+          Jaipur
+        </Typography>
+        <IconButton onClick={handleSettingsClick} size="large">
+          <SettingsIcon fontSize="inherit" />
+        </IconButton>
+      </Stack>
       <Card>
         <List subheader={<ListSubheader>Liste des parties</ListSubheader>}>
           {games && games.length > 0 ? (
@@ -108,6 +128,44 @@ export default function Home() {
         <AddIcon />
       </Fab>
     </Container>
+  )
+}
+
+interface SettingsDialogProps {
+  defaultBasePath: string
+  onClose: (url: string | undefined) => void
+}
+
+function SettingsDialog({ defaultBasePath, onClose }: SettingsDialogProps) {
+  const [basePath, setBasePath] = useState(defaultBasePath)
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault()
+    onClose(basePath)
+  }
+
+  return (
+    <Dialog open onClose={() => onClose(undefined)} maxWidth="sm" fullWidth>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Créer une partie</DialogTitle>
+        <DialogContent>
+          <TextField
+            id="basePath"
+            value={basePath}
+            onChange={(e) => setBasePath(e.target.value)}
+            margin="dense"
+            label="Base Path"
+            fullWidth
+            required
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => onClose(undefined)}>Annuler</Button>
+          <Button type="submit">Sauvegarder</Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   )
 }
 
