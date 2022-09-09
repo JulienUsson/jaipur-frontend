@@ -1,5 +1,8 @@
+import { ThemeProvider } from '@emotion/react'
 import { ReactNode } from 'react'
 import ReactDOM from 'react-dom'
+
+import { theme } from '../theme'
 
 type CreateDialogChild<T> = (onClose: (arg: T) => void) => ReactNode
 
@@ -15,6 +18,6 @@ export default function createDialog<T = void>(child: CreateDialogChild<T>): Pro
       resolve(arg)
     }
 
-    ReactDOM.render(<>{child(onClose)}</>, root)
+    ReactDOM.render(<ThemeProvider theme={theme}>{child(onClose)}</ThemeProvider>, root)
   })
 }

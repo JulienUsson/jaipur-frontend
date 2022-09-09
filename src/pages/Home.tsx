@@ -10,7 +10,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Fab,
   IconButton,
   List,
   ListItem,
@@ -19,13 +18,15 @@ import {
   ListSubheader,
   Stack,
   TextField,
-  Typography,
 } from '@mui/material'
+import { Box } from '@mui/system'
+import { upperFirst } from 'lodash'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { mutate } from 'swr'
 
 import { Configuration } from '../api'
+import TitleImg from '../assets/title.png'
 
 import { useApiConfig, useGameApi } from '../contexts/ApiConfigContext'
 import useGames from '../hooks/useGames'
@@ -42,7 +43,7 @@ export default function Home() {
       <SelectPlayerDialog onClose={onClose} />
     ))
     if (playerIndex !== undefined) {
-      navigate(`/games/${gameId}/player/${playerIndex}`)
+      navigate(`/games/${gameId}/players/${playerIndex}`)
     }
   }
 
@@ -83,14 +84,30 @@ export default function Home() {
 
   return (
     <Container maxWidth="md">
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h2" gutterBottom>
-          Jaipur
-        </Typography>
-        <IconButton onClick={handleSettingsClick} size="large">
-          <SettingsIcon fontSize="inherit" />
-        </IconButton>
+      <Stack alignItems="center">
+        <Box component="img" mt={2} height="20vw" maxHeight={150} src={TitleImg} />
+        <Stack direction="row" my={2} spacing={2}>
+          <Button
+            onClick={handleAddClick}
+            variant="contained"
+            startIcon={<AddIcon />}
+            color="primary"
+            size="large"
+          >
+            Créer une partie
+          </Button>
+          <Button
+            onClick={handleSettingsClick}
+            variant="contained"
+            startIcon={<SettingsIcon />}
+            color="primary"
+            size="large"
+          >
+            Paramètres
+          </Button>
+        </Stack>
       </Stack>
+
       <Card>
         <List subheader={<ListSubheader>Liste des parties</ListSubheader>}>
           {games && games.length > 0 ? (
@@ -104,7 +121,7 @@ export default function Home() {
                 }
               >
                 <ListItemButton onClick={handleClick(game.id)}>
-                  <ListItemText primary={game.name} />
+                  <ListItemText primary={upperFirst(game.name)} />
                 </ListItemButton>
               </ListItem>
             ))
@@ -118,14 +135,6 @@ export default function Home() {
           )}
         </List>
       </Card>
-      <Fab
-        onClick={handleAddClick}
-        sx={{ position: 'absolute', right: 8, bottom: 8 }}
-        color="primary"
-        aria-label="add"
-      >
-        <AddIcon />
-      </Fab>
     </Container>
   )
 }
