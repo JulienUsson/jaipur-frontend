@@ -18,6 +18,10 @@ import {
     GoodFromJSON,
     GoodFromJSONTyped,
     GoodToJSON,
+    GoodOrCamel,
+    GoodOrCamelFromJSON,
+    GoodOrCamelFromJSONTyped,
+    GoodOrCamelToJSON,
     Tokens,
     TokensFromJSON,
     TokensFromJSONTyped,
@@ -50,10 +54,10 @@ export interface Game {
     id: number;
     /**
      * 
-     * @type {Array<Good>}
+     * @type {Array<GoodOrCamel>}
      * @memberof Game
      */
-    market: Array<Good>;
+    market: Array<GoodOrCamel>;
     /**
      * 
      * @type {Tokens}
@@ -93,7 +97,7 @@ export function GameFromJSONTyped(json: any, ignoreDiscriminator: boolean): Game
         'currentPlayerIndex': json['currentPlayerIndex'],
         'name': json['name'],
         'id': json['id'],
-        'market': ((json['market'] as Array<any>).map(GoodFromJSON)),
+        'market': ((json['market'] as Array<any>).map(GoodOrCamelFromJSON)),
         'tokens': TokensFromJSON(json['tokens']),
         'hand': ((json['hand'] as Array<any>).map(GoodFromJSON)),
         'camelsCount': json['camelsCount'],
@@ -113,7 +117,7 @@ export function GameToJSON(value?: Game | null): any {
         'currentPlayerIndex': value.currentPlayerIndex,
         'name': value.name,
         'id': value.id,
-        'market': ((value.market as Array<any>).map(GoodToJSON)),
+        'market': ((value.market as Array<any>).map(GoodOrCamelToJSON)),
         'tokens': TokensToJSON(value.tokens),
         'hand': ((value.hand as Array<any>).map(GoodToJSON)),
         'camelsCount': value.camelsCount,
