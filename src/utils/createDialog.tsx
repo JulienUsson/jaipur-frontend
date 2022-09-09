@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@emotion/react'
+import { Alert, Snackbar } from '@mui/material'
 import { ReactNode } from 'react'
 import ReactDOM from 'react-dom'
 
@@ -20,4 +21,12 @@ export default function createDialog<T = void>(child: CreateDialogChild<T>): Pro
 
     ReactDOM.render(<ThemeProvider theme={theme}>{child(onClose)}</ThemeProvider>, root)
   })
+}
+
+export function showError(message: string) {
+  createDialog((onClose) => (
+    <Snackbar open autoHideDuration={6000} onClose={() => onClose()}>
+      <Alert severity="error">{message}</Alert>
+    </Snackbar>
+  ))
 }

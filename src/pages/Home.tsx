@@ -2,7 +2,6 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SettingsIcon from '@mui/icons-material/Settings'
 import {
-  Alert,
   Button,
   Card,
   Container,
@@ -30,7 +29,7 @@ import TitleImg from '../assets/title.png'
 
 import { useApiConfig, useGameApi } from '../contexts/ApiConfigContext'
 import useGames from '../hooks/useGames'
-import createDialog from '../utils/createDialog'
+import createDialog, { showError } from '../utils/createDialog'
 
 export default function Home() {
   const api = useGameApi()
@@ -52,7 +51,7 @@ export default function Home() {
       await api.deleteGameById({ gameId })
       mutate('games')
     } catch (e) {
-      await createDialog(() => <Alert severity="error">Impossible de supprimer la partie.</Alert>)
+      showError('Impossible de supprimer la partie.')
       console.error(e)
     }
   }
@@ -67,7 +66,7 @@ export default function Home() {
       await api.createGame({ createGame: { name } })
       mutate('games')
     } catch (e) {
-      createDialog(() => <Alert severity="error">Impossible de créer la partie.</Alert>)
+      showError('Impossible de créer la partie.')
       console.error(e)
     }
   }

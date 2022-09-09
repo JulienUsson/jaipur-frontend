@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Box,
   Button,
   Container,
@@ -16,17 +17,23 @@ import { upperFirst } from 'lodash'
 import range from 'lodash/range'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { mutate } from 'swr'
 
-import { BonusTokens, Good, GoodOrCamel, Tokens } from '../api'
-import cardsImg from '../assets/cards.png'
-import tokensImg from '../assets/icons.png'
-import TitleImg from '../assets/title.png'
-import useGame from '../hooks/useGame'
-import { useGameIdFromPath, usePlayerIndexFromPath } from '../hooks/usePath'
+import { BonusTokens, Good, GoodOrCamel, Tokens } from '../../api'
+import cardsImg from '../../assets/cards.png'
+import tokensImg from '../../assets/icons.png'
+import TitleImg from '../../assets/title.png'
+import { useGameApi } from '../../contexts/ApiConfigContext'
+import useGame from '../../hooks/useGame'
+import { useGameIdFromPath, usePlayerIndexFromPath } from '../../hooks/usePath'
+import createDialog, { showError } from '../../utils/createDialog'
+
+import TakeCamelsDialog from './actions/TakeCamelsDialog'
 
 export default function Game() {
   const gameId = useGameIdFromPath()
   const playerId = usePlayerIndexFromPath()
+  const api = useGameApi()
   const game = useGame(gameId, playerId)
 
   return (
@@ -133,7 +140,7 @@ export default function Game() {
         <Button variant="contained" color="primary" size="large">
           Echanger des marchandises
         </Button>
-        <Button variant="contained" color="primary" size="large">
+        <Button variant="contained" color="primary" size="large" onClick={handleTakeCamels}>
           Prendre les chameaux
         </Button>
         <Button variant="contained" color="primary" size="large">
@@ -144,6 +151,20 @@ export default function Game() {
       <Box height={300} />
     </Container>
   )
+
+  async function handleTakeCamels() {
+    const isTakingCamels = await createDialog<boolean>((onClose) => (
+      <TakeCamelsDialog onClose={onClose} />
+    ))
+    if (isTakingCamels) {
+      try {
+        await api.takeCamels({ gameId, playerId })
+        await mutate(`games/${gameId}/players/${playerId}`)
+      } catch (e) {
+        showError('Impossible de prendre les chameaux.')
+      }
+    }
+  }
 }
 
 const CardStack = (props: StackProps) => (
@@ -201,22 +222,20 @@ const TokenStack = ({ children, ...props }: StackProps) => {
     return null
   }
   return (
-    <Paper sx={{ p: 1 }}>
-      <Stack
-        direction="row"
-        spacing={1}
-        flexWrap="wrap"
-        {...props}
-        sx={{
-          pl: (t) => `${TOKEN_IMG_WIDTH / 3}px`,
-          '& > *': {
-            marginLeft: `-${TOKEN_IMG_WIDTH / 3}px !important`,
-          },
-        }}
-      >
-        {React.Children.toArray(children).reverse()}
-      </Stack>
-    </Paper>
+    <Stack
+      direction="row"
+      spacing={1}
+      flexWrap="wrap"
+      {...props}
+      sx={{
+        pl: `${TOKEN_IMG_WIDTH / 3}px`,
+        '& > *': {
+          marginLeft: `-${TOKEN_IMG_WIDTH / 3}px !important`,
+        },
+      }}
+    >
+      {React.Children.toArray(children).reverse()}
+    </Stack>
   )
 }
 
