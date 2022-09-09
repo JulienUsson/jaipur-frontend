@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    BonusTokens,
+    BonusTokensFromJSON,
+    BonusTokensFromJSONTyped,
+    BonusTokensToJSON,
     Good,
     GoodFromJSON,
     GoodFromJSONTyped,
@@ -82,6 +86,12 @@ export interface Game {
      * @memberof Game
      */
     winnerIndex?: number;
+    /**
+     * 
+     * @type {BonusTokens}
+     * @memberof Game
+     */
+    bonusTokens: BonusTokens;
 }
 
 export function GameFromJSON(json: any): Game {
@@ -102,6 +112,7 @@ export function GameFromJSONTyped(json: any, ignoreDiscriminator: boolean): Game
         'hand': ((json['hand'] as Array<any>).map(GoodFromJSON)),
         'camelsCount': json['camelsCount'],
         'winnerIndex': !exists(json, 'winnerIndex') ? undefined : json['winnerIndex'],
+        'bonusTokens': BonusTokensFromJSON(json['bonusTokens']),
     };
 }
 
@@ -122,6 +133,7 @@ export function GameToJSON(value?: Game | null): any {
         'hand': ((value.hand as Array<any>).map(GoodToJSON)),
         'camelsCount': value.camelsCount,
         'winnerIndex': value.winnerIndex,
+        'bonusTokens': BonusTokensToJSON(value.bonusTokens),
     };
 }
 

@@ -2,6 +2,7 @@ apis/GameApi.ts
 apis/HealthApi.ts
 apis/index.ts
 index.ts
+models/BonusTokens.ts
 models/CreateGame.ts
 models/ExchangePayload.ts
 models/Game.ts

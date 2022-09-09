@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './BonusTokens';
 export * from './CreateGame';
 export * from './ExchangePayload';
 export * from './Game';
