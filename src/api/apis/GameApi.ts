@@ -57,7 +57,6 @@ export interface FindOneGameByIdAndPlayerIdRequest {
 export interface SellRequest {
     gameId: number;
     playerId: number;
-    playerIndex: number;
     sellPayload?: SellPayload;
 }
 
@@ -244,19 +243,11 @@ export class GameApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('playerId','Required parameter requestParameters.playerId was null or undefined when calling sell.');
         }
 
-        if (requestParameters.playerIndex === null || requestParameters.playerIndex === undefined) {
-            throw new runtime.RequiredError('playerIndex','Required parameter requestParameters.playerIndex was null or undefined when calling sell.');
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
-
-        if (requestParameters.playerIndex !== undefined && requestParameters.playerIndex !== null) {
-            headerParameters['playerIndex'] = String(requestParameters.playerIndex);
-        }
 
         const response = await this.request({
             path: `/games/{gameId}/players/{playerId}/sell`.replace(`{${"gameId"}}`, encodeURIComponent(String(requestParameters.gameId))).replace(`{${"playerId"}}`, encodeURIComponent(String(requestParameters.playerId))),

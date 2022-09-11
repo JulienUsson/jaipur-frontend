@@ -13,7 +13,7 @@ interface TakeGoodDialogProps {
 export default function TakeGoodDialog({ market, onClose }: TakeGoodDialogProps) {
   const [selectedGood, setSelectedGood] = useState<Good>()
   return (
-    <Dialog open onClose={() => onClose()}>
+    <Dialog open onClose={() => onClose()} maxWidth="xl">
       <DialogTitle>Prendre une marchandise</DialogTitle>
       <CardContent>
         <Stack direction="row" spacing={1} flexWrap="wrap">

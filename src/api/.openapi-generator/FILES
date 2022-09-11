@@ -14,4 +14,3 @@ models/SellPayload.ts
 models/TakeGoodPayload.ts
 models/Tokens.ts
 models/index.ts
-runtime.ts

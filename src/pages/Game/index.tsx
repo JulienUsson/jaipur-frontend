@@ -19,7 +19,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { mutate } from 'swr'
 
-import { BonusTokens, Good, GoodOrCamel, Tokens } from '../../api'
+import { BonusTokens, Good, GoodOrCamel, SellPayload, Tokens } from '../../api'
 import cardsImg from '../../assets/cards.png'
 import tokensImg from '../../assets/icons.png'
 import TitleImg from '../../assets/title.png'
@@ -27,6 +27,8 @@ import { useGameApi } from '../../contexts/ApiConfigContext'
 import useGame from '../../hooks/useGame'
 import { useGameIdFromPath, usePlayerIndexFromPath } from '../../hooks/usePath'
 import createDialog, { showError } from '../../utils/createDialog'
+
+import SellDialog from './actions/SellDialog'
 
 import TakeCamelsDialog from './actions/TakeCamelsDialog'
 import TakeGoodDialog from './actions/TakeGoodDialog'
@@ -144,7 +146,7 @@ export default function Game() {
         <Button variant="contained" color="primary" size="large" onClick={handleTakeCamels}>
           Prendre les chameaux
         </Button>
-        <Button variant="contained" color="primary" size="large">
+        <Button variant="contained" color="primary" size="large" onClick={handleSell}>
           Vendre des cartes
         </Button>
       </Stack>
@@ -186,6 +188,24 @@ export default function Game() {
         await mutate(`games/${gameId}/players/${playerId}`)
       } catch (e) {
         showError('Impossible de prendre les chameaux.')
+      }
+    }
+  }
+
+  async function handleSell() {
+    const sellPayload = await createDialog<SellPayload | undefined>((onClose) => (
+      <SellDialog hand={uniq(game.hand)} onClose={onClose} />
+    ))
+    if (sellPayload) {
+      try {
+        await api.sell({
+          gameId,
+          playerId,
+          sellPayload,
+        })
+        await mutate(`games/${gameId}/players/${playerId}`)
+      } catch (e) {
+        showError('Impossible de vendre.')
       }
     }
   }
