@@ -1,3 +1,4 @@
+import { Fireworks } from '@fireworks-js/react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
@@ -40,6 +41,53 @@ export default function Game() {
   const playerId = usePlayerIndexFromPath()
   const api = useGameApi()
   const game = useGame(gameId, playerId)
+
+  if (game.winnerIndex !== undefined && game.winnerIndex !== null) {
+    const hasWin = game.winnerIndex === playerId
+    return (
+      <Container>
+        {hasWin && (
+          <Fireworks
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+            }}
+          />
+        )}
+
+        <Stack alignItems="center">
+          <Link to="/">
+            <Box component="img" my={2} height="10vw" maxHeight={100} src={TitleImg} />
+          </Link>
+        </Stack>
+
+        <Paper sx={{ p: 2 }}>
+          <Stack alignItems="center">
+            <Typography variant="h3" align="center">
+              {hasWin ? (
+                <>
+                  Bravo joueur {playerId! + 1},<br />
+                  tu as gagné(e) !
+                </>
+              ) : (
+                <>
+                  Dommage joueur {playerId! + 1},<br />
+                  tu as perdu(e)
+                </>
+              )}
+            </Typography>
+            <Link to="/">
+              <Button sx={{ mt: 1 }}>Retourner à l&apos;accueil</Button>
+            </Link>
+          </Stack>
+        </Paper>
+      </Container>
+    )
+  }
 
   return (
     <Container>

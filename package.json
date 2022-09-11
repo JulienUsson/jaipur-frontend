@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
+    "@fireworks-js/react": "^2.0.4",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.10.0",
     "@openapitools/openapi-generator-cli": "^2.5.1",
