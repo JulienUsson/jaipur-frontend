@@ -19,7 +19,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { mutate } from 'swr'
 
-import { BonusTokens, Good, GoodOrCamel, SellPayload, Tokens } from '../../api'
+import { BonusTokens, ExchangePayload, Good, GoodOrCamel, SellPayload, Tokens } from '../../api'
 import cardsImg from '../../assets/cards.png'
 import tokensImg from '../../assets/icons.png'
 import TitleImg from '../../assets/title.png'
@@ -27,6 +27,8 @@ import { useGameApi } from '../../contexts/ApiConfigContext'
 import useGame from '../../hooks/useGame'
 import { useGameIdFromPath, usePlayerIndexFromPath } from '../../hooks/usePath'
 import createDialog, { showError } from '../../utils/createDialog'
+
+import ExchangeDialog from './actions/ExchangeDialog'
 
 import SellDialog from './actions/SellDialog'
 
@@ -140,7 +142,7 @@ export default function Game() {
         <Button variant="contained" color="primary" size="large" onClick={handleTakeGood}>
           Prendre une marchandise
         </Button>
-        <Button variant="contained" color="primary" size="large">
+        <Button variant="contained" color="primary" size="large" onClick={handleExchange}>
           Echanger des marchandises
         </Button>
         <Button variant="contained" color="primary" size="large" onClick={handleTakeCamels}>
@@ -174,6 +176,31 @@ export default function Game() {
         await mutate(`games/${gameId}/players/${playerId}`)
       } catch (e) {
         showError('Impossible de prendre une marchandise.')
+      }
+    }
+  }
+
+  async function handleExchange() {
+    const marketGoods: Good[] = uniq(
+      game.market.filter((goodOrCamel) => goodOrCamel !== GoodOrCamel.Camel) as unknown as Good[],
+    )
+    const handWithCamels: GoodOrCamel[] = [
+      ...(game.hand as unknown as GoodOrCamel[]),
+      ...range(game.camelsCount).map(() => GoodOrCamel.Camel),
+    ]
+    const exchangePayload = await createDialog<ExchangePayload | undefined>((onClose) => (
+      <ExchangeDialog market={marketGoods} hand={handWithCamels} onClose={onClose} />
+    ))
+    if (exchangePayload) {
+      try {
+        await api.exchange({
+          gameId,
+          playerId,
+          exchangePayload,
+        })
+        await mutate(`games/${gameId}/players/${playerId}`)
+      } catch (e) {
+        showError('Impossible de vendre.')
       }
     }
   }
