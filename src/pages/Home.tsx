@@ -154,22 +154,26 @@ function SettingsDialog({ defaultBasePath, onClose }: SettingsDialogProps) {
   return (
     <Dialog open onClose={() => onClose(undefined)} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Créer une partie</DialogTitle>
+        <DialogTitle>Paramètres</DialogTitle>
         <DialogContent>
           <TextField
             id="basePath"
             value={basePath}
             onChange={(e) => setBasePath(e.target.value)}
             margin="dense"
-            label="Base Path"
+            label="URL du Backend"
             fullWidth
             required
             autoFocus
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(undefined)}>Annuler</Button>
-          <Button type="submit">Sauvegarder</Button>
+          <Button color="inherit" onClick={() => onClose(undefined)}>
+            Annuler
+          </Button>
+          <Button type="submit" color="inherit">
+            Sauvegarder
+          </Button>
         </DialogActions>
       </form>
     </Dialog>
@@ -205,8 +209,12 @@ function CreateGameDialog({ onClose }: CreateGameDialogProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(undefined)}>Annuler</Button>
-          <Button type="submit">Créer</Button>
+          <Button color="inherit" onClick={() => onClose(undefined)}>
+            Annuler
+          </Button>
+          <Button color="inherit" type="submit">
+            Créer
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

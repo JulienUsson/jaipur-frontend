@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Alert,
   Box,
   Button,
   Container,
@@ -15,6 +14,7 @@ import {
 } from '@mui/material'
 import { upperFirst } from 'lodash'
 import range from 'lodash/range'
+import uniq from 'lodash/uniq'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { mutate } from 'swr'
@@ -29,6 +29,7 @@ import { useGameIdFromPath, usePlayerIndexFromPath } from '../../hooks/usePath'
 import createDialog, { showError } from '../../utils/createDialog'
 
 import TakeCamelsDialog from './actions/TakeCamelsDialog'
+import TakeGoodDialog from './actions/TakeGoodDialog'
 
 export default function Game() {
   const gameId = useGameIdFromPath()
@@ -58,7 +59,7 @@ export default function Game() {
       </CardStack>
 
       <Typography variant="h6" mt={2}>
-        Ma Main
+        Ma Main ({game.hand.length})
       </Typography>
       <CardStack>
         {game.hand.map((card, index) => (
@@ -67,7 +68,7 @@ export default function Game() {
       </CardStack>
 
       <Typography variant="h6" mt={2}>
-        Mon Enclos
+        Mon Enclos ({game.camelsCount})
       </Typography>
       <CardStack>
         {range(game.camelsCount).map((index) => (
@@ -134,7 +135,7 @@ export default function Game() {
         Actions
       </Typography>
       <Stack direction="column" spacing={1} alignItems="flex-start">
-        <Button variant="contained" color="primary" size="large">
+        <Button variant="contained" color="primary" size="large" onClick={handleTakeGood}>
           Prendre une marchandise
         </Button>
         <Button variant="contained" color="primary" size="large">
@@ -152,6 +153,29 @@ export default function Game() {
     </Container>
   )
 
+  async function handleTakeGood() {
+    const marketGoods = uniq(
+      game.market.filter((goodOrCamel) => goodOrCamel !== GoodOrCamel.Camel) as unknown as Good[],
+    )
+    const good = await createDialog<Good | undefined>((onClose) => (
+      <TakeGoodDialog market={marketGoods} onClose={onClose} />
+    ))
+    if (good) {
+      try {
+        await api.takeGood({
+          gameId,
+          playerId,
+          takeGoodPayload: {
+            good,
+          },
+        })
+        await mutate(`games/${gameId}/players/${playerId}`)
+      } catch (e) {
+        showError('Impossible de prendre une marchandise.')
+      }
+    }
+  }
+
   async function handleTakeCamels() {
     const isTakingCamels = await createDialog<boolean>((onClose) => (
       <TakeCamelsDialog onClose={onClose} />
@@ -167,55 +191,80 @@ export default function Game() {
   }
 }
 
-const CardStack = (props: StackProps) => (
-  <Paper sx={{ p: 2 }}>
-    <Stack direction="row" spacing={1} flexWrap="wrap" {...props} />
-  </Paper>
-)
+const CardStack = ({ children, ...props }: StackProps) => {
+  if (React.Children.count(children) === 0) {
+    return (
+      <Paper sx={{ p: 2 }}>
+        <Typography>Aucune carte</Typography>
+      </Paper>
+    )
+  }
+  return (
+    <Paper sx={{ p: 2 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        flexWrap="wrap"
+        {...props}
+        sx={{
+          '& > *': {
+            mb: 1,
+          },
+        }}
+      >
+        {children}
+      </Stack>
+    </Paper>
+  )
+}
 
 const CARD_IMG_HEIGHT = 516
 const CARD_IMG_WIDTH = 372
 
-const Card = styled('div')<{ type: GoodOrCamel | Good }>(({ type }) => {
-  let index
-  switch (type) {
-    case GoodOrCamel.Diamonds:
-      index = 2
-      break
-    case GoodOrCamel.Leather:
-      index = 3
-      break
-    case GoodOrCamel.Gold:
-      index = 4
-      break
-    case GoodOrCamel.Spice:
-      index = 5
-      break
-    case GoodOrCamel.Silver:
-      index = 6
-      break
-    case GoodOrCamel.Cloth:
-      index = 7
-      break
-    case GoodOrCamel.Camel:
-      index = 8
-      break
-    default:
-      index = 1
-  }
-  return {
-    borderRadius: 10,
-    position: 'relative',
-    width: CARD_IMG_WIDTH / 2,
-    height: CARD_IMG_HEIGHT / 2,
-    backgroundImage: `url("${cardsImg}")`,
-    backgroundColor: '#fff',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'scroll',
-    backgroundPosition: `-${(CARD_IMG_WIDTH / 2) * index}px 0`,
-    backgroundSize: `${3864 / 2}px ${CARD_IMG_HEIGHT / 2}px`,
-  }
-})
+export const Card = styled('div')<{ type: GoodOrCamel | Good; selected?: boolean }>(
+  ({ type, selected, onClick }) => {
+    let index
+    switch (type) {
+      case GoodOrCamel.Diamonds:
+        index = 2
+        break
+      case GoodOrCamel.Leather:
+        index = 3
+        break
+      case GoodOrCamel.Gold:
+        index = 4
+        break
+      case GoodOrCamel.Spice:
+        index = 5
+        break
+      case GoodOrCamel.Silver:
+        index = 6
+        break
+      case GoodOrCamel.Cloth:
+        index = 7
+        break
+      case GoodOrCamel.Camel:
+        index = 8
+        break
+      default:
+        index = 1
+    }
+    return {
+      borderRadius: 10,
+      position: 'relative',
+      width: CARD_IMG_WIDTH / 2,
+      height: CARD_IMG_HEIGHT / 2,
+      backgroundImage: `url("${cardsImg}")`,
+      backgroundColor: '#fff',
+      backgroundRepeat: 'no-repeat',
+      backgroundAttachment: 'scroll',
+      backgroundPosition: `-${(CARD_IMG_WIDTH / 2) * index}px 0`,
+      backgroundSize: `${3864 / 2}px ${CARD_IMG_HEIGHT / 2}px`,
+      cursor: onClick ? 'pointer' : 'default',
+      filter: selected ? 'grayscale(0.7)' : 'initial',
+    }
+  },
+)
 
 const TokenStack = ({ children, ...props }: StackProps) => {
   if (React.Children.count(children) === 0) {

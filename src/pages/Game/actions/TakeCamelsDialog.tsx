@@ -6,12 +6,16 @@ interface TakeCamelsDialogProps {
 
 export default function TakeCamelsDialog({ onClose }: TakeCamelsDialogProps) {
   return (
-    <Dialog open onClose={() => onClose(false)} maxWidth="xs" fullWidth>
+    <Dialog open onClose={() => onClose(false)}>
       <DialogTitle>Prendre les chameaux</DialogTitle>
 
       <DialogActions>
-        <Button onClick={() => onClose(false)}>Annuler</Button>
-        <Button onClick={() => onClose(true)}>Valider</Button>
+        <Button color="inherit" onClick={() => onClose(false)}>
+          Annuler
+        </Button>
+        <Button color="inherit" onClick={() => onClose(true)}>
+          Valider
+        </Button>
       </DialogActions>
     </Dialog>
   )
